@@ -1,0 +1,69 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "confirm": "Confirm",
+    "back": "Go back",
+    "next": "Next",
+    "prev": "Previous",
+    "close": "Close",
+    "retry": "Retry"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Sign up",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "socialLogin": "Social login",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "continueWithKakao": "Continue with Kakao"
+  },
+  "cards": {
+    "title": "Cards",
+    "addCard": "Add card",
+    "scanCard": "Scan card",
+    "editCard": "Edit card",
+    "deleteCard": "Delete card",
+    "noCards": "No cards registered",
+    "searchPlaceholder": "Search by name, company, or title"
+  },
+  "folders": {
+    "title": "Folders",
+    "createFolder": "Create folder",
+    "editFolder": "Edit folder",
+    "deleteFolder": "Delete folder",
+    "defaultFolder": "Uncategorized",
+    "noFolders": "No folders"
+  },
+  "tags": {
+    "title": "Tags",
+    "createTag": "Create tag",
+    "editTag": "Edit tag",
+    "deleteTag": "Delete tag",
+    "noTags": "No tags"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Edit profile",
+    "export": "Export data",
+    "help": "Help",
+    "version": "Version"
+  },
+  "export": {
+    "csv": "Export CSV",
+    "vcard": "Export vCard",
+    "selectScope": "Select export scope",
+    "allCards": "All cards",
+    "byFolder": "By folder"
+  }
+}

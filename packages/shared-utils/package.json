@@ -1,0 +1,20 @@
+{
+  "name": "@cardkeeper/shared-utils",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@cardkeeper/typescript-config": "workspace:*",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
+  }
+}

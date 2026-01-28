@@ -1,0 +1,28 @@
+{
+  "name": "cardkeeper",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=web",
+    "dev:web:https": "pnpm --filter web dev:https",
+    "dev:mobile": "turbo dev --filter=mobile",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:generate": "pnpm --filter web exec prisma generate",
+    "db:push": "pnpm --filter web exec prisma db push",
+    "db:migrate:dev": "pnpm --filter web exec prisma migrate dev",
+    "db:migrate:deploy": "pnpm --filter web exec prisma migrate deploy",
+    "db:seed": "pnpm --filter web exec prisma db seed",
+    "db:studio": "pnpm --filter web exec prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "prettier": "^3.4.0"
+  }
+}

@@ -1,0 +1,278 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  APPLE
+  KAKAO
+  FIREBASE
+}
+
+enum ScanMethod {
+  OCR_CAMERA
+  OCR_GALLERY
+  MANUAL
+}
+
+enum ContactType {
+  PHONE
+  EMAIL
+  FAX
+  MOBILE
+  OTHER
+}
+
+enum ScanStatus {
+  PENDING
+  CONFIRMED
+  EXPIRED
+}
+
+// ─── User ────────────────────────────────────────────────
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  name          String?
+  passwordHash  String?
+  avatarUrl     String?
+  authProvider  AuthProvider  @default(EMAIL)
+  firebaseUid   String?      @unique
+  emailVerified DateTime?
+
+  cards         BusinessCard[]
+  folders       Folder[]
+  tags          Tag[]
+  accounts      Account[]
+  sessions      Session[]
+  refreshTokens RefreshToken[]
+  loginAttempts LoginAttempt[]
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([email])
+  @@index([firebaseUid])
+}
+
+// ─── BusinessCard ────────────────────────────────────────
+
+model BusinessCard {
+  id             String          @id @default(cuid())
+  userId         String
+  folderId       String?
+  name           String
+  company        String?
+  jobTitle       String?
+  address        String?
+  website        String?
+  memo           String?         @db.Text
+  imageUrl       String?
+  thumbnailUrl   String?
+  ocrRawText     String?         @db.Text
+  ocrConfidence  Float?
+  scanMethod     ScanMethod      @default(MANUAL)
+  isFavorite     Boolean         @default(false)
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder         Folder?         @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  contactDetails ContactDetail[]
+  tags           CardTag[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([folderId])
+  @@index([userId, name])
+  @@index([userId, company])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, updatedAt(sort: Desc)])
+  @@index([userId, isFavorite])
+}
+
+// ─── ContactDetail ───────────────────────────────────────
+
+model ContactDetail {
+  id        String       @id @default(cuid())
+  cardId    String
+  type      ContactType
+  label     String?
+  value     String
+  isPrimary Boolean      @default(false)
+
+  card      BusinessCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@index([cardId, type])
+}
+
+// ─── Folder ──────────────────────────────────────────────
+
+model Folder {
+  id        String         @id @default(cuid())
+  userId    String
+  parentId  String?
+  name      String
+  color     String?        @default("#6366F1")
+  order     Int            @default(0)
+  isDefault Boolean        @default(false)
+
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Folder?        @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Folder[]       @relation("FolderHierarchy")
+  cards     BusinessCard[]
+
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([userId, name, parentId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([userId, order])
+}
+
+// ─── Tag ─────────────────────────────────────────────────
+
+model Tag {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  color     String?   @default("#8B5CF6")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards     CardTag[]
+
+  createdAt DateTime  @default(now())
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+// ─── CardTag (N:M Join) ──────────────────────────────────
+
+model CardTag {
+  cardId     String
+  tagId      String
+
+  card       BusinessCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  tag        Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  assignedAt DateTime     @default(now())
+
+  @@id([cardId, tagId])
+  @@index([cardId])
+  @@index([tagId])
+}
+
+// ─── Auth.js Models ──────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Custom Auth Models ──────────────────────────────────
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  email     String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+  @@index([token])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  ipAddress String?
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email, createdAt])
+  @@index([userId, createdAt])
+}
+
+// ─── OCR Scan Result ─────────────────────────────────────
+
+model ScanResult {
+  id            String     @id @default(cuid())
+  userId        String
+  imageUrl      String
+  thumbnailUrl  String?
+  rawText       String?    @db.Text
+  confidence    Float?
+  parsedData    Json?
+  status        ScanStatus @default(PENDING)
+  createdAt     DateTime   @default(now())
+  expiresAt     DateTime
+
+  @@index([userId])
+  @@index([expiresAt])
+}

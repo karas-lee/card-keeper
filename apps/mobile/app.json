@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "CardKeeper",
+    "slug": "cardkeeper",
+    "version": "0.1.0",
+    "scheme": "cardkeeper",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6366F1"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cardkeeper.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "명함을 스캔하기 위해 카메라 접근이 필요합니다.",
+        "NSPhotoLibraryUsageDescription": "갤러리에서 명함 이미지를 선택하기 위해 사진 접근이 필요합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#6366F1"
+      },
+      "package": "com.cardkeeper.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-camera",
+      "expo-image-picker",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a6c84ff3-2cdb-460b-a8f1-06e78e7d2e8c"
+      }
+    }
+  }
+}
