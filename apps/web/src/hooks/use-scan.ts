@@ -1,9 +1,10 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth.store";
+import { cardKeys } from "./use-cards";
 
 const API_BASE = "/api/v1";
 
@@ -35,6 +36,7 @@ export function useUploadScan() {
 export function useConfirmScan() {
   const { accessToken } = useAuthStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: any) => {
@@ -53,6 +55,7 @@ export function useConfirmScan() {
       return res.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cardKeys.lists() });
       toast.success("명함이 저장되었습니다");
       router.push("/cards");
     },
