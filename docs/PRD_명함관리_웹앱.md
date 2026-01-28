@@ -57,7 +57,7 @@
 | 구분 | CamCard | ABBYY BCR | 본 서비스 (차별점) |
 |---|---|---|---|
 | 플랫폼 | Mobile 중심 | Mobile 중심 | **Web + Mobile 동시 지원** |
-| OCR 정확도 | 높음 | 매우 높음 | Google Cloud Vision 기반 (98%+) |
+| OCR 정확도 | 높음 | 매우 높음 | Tesseract.js 기반 (Dual-pass 전처리) |
 | 개인 사용자 최적화 | 기업 기능 과다 | 단순 스캔 중심 | **개인 네트워킹에 최적화된 UX** |
 | 가격 | 유료 중심 | 유료 | **Freemium 모델** |
 
@@ -113,12 +113,12 @@
 
 ### 3.2 명함 스캔 - OCR `P0`
 
-- **기술:** Google Cloud Vision API (TEXT_DETECTION + DOCUMENT_TEXT_DETECTION)
+- **기술:** Tesseract.js (Worker Pool + Dual-pass 전처리)
 - **스캔 플로우:**
   1. 카메라 활성화 및 명함 프레임 가이드 표시
   2. 자동/수동 촬영
-  3. 이미지 전처리 (크롭, 보정)
-  4. OCR API 호출 및 텍스트 추출
+  3. 이미지 전처리 (Sharp: 리사이즈, 그레이스케일, 이진화, 샤프닝)
+  4. Dual-pass OCR 실행 (일반 + 반전 전처리 병렬) 및 confidence 비교
   5. 추출 텍스트를 구조화된 필드로 파싱 (이름, 회사, 직함, 전화, 이메일, 주소, 웹사이트)
   6. 사용자 검증 및 수정 화면 표시
   7. 확인 후 저장
@@ -248,7 +248,7 @@
                        │
 ┌──────────────────────┼────────────────────────────────┐
 │              외부 서비스 (External)                      │
-│  Google Cloud Vision │ PostgreSQL (Neon) │ AWS S3     │
+│  Tesseract.js (OCR)  │ PostgreSQL (Neon) │ AWS S3     │
 │  Auth.js v5          │ Firebase Auth     │ Vercel     │
 └───────────────────────────────────────────────────────┘
 ```
@@ -300,7 +300,7 @@ apps/
 | Next.js API Routes | REST API 서버 (Serverless) |
 | Prisma ORM v6+ | Type-safe DB ORM, Migration 관리 |
 | PostgreSQL 16 (Neon) | 주 데이터베이스 (Full-text Search, Auto-scaling) |
-| Google Cloud Vision API | OCR 엔진 (98%+ 정확도) |
+| Tesseract.js | OCR 엔진 (Worker Pool + Dual-pass 전처리) |
 | AWS S3 | 명함 이미지 저장소 |
 | Auth.js v5 / Firebase Auth | Web / Mobile 인증 |
 | Vercel | Web 배포 (Edge Functions, 자동 CI/CD) |
@@ -317,8 +317,9 @@ apps/
 (크롭, 회전, 압축)
                           → 이미지 수신
                           → S3 업로드           → AWS S3
-                          → OCR 요청            → Google Cloud Vision
-                          ← OCR Raw Text
+                          → Dual-pass 전처리 (A: 일반 / B: 반전)
+                          → Tesseract.js OCR (병렬 recognize, rotateAuto)
+                          ← confidence 높은 결과 선택
                           → 텍스트 파싱/구조화
                             - 이메일: 정규식 매칭
                             - 전화: 정규식 매칭
@@ -715,7 +716,7 @@ GET /api/v1/cards?search=김&folderId=xxx&tagIds=yyy,zzz&isFavorite=true&sort=cr
 |---|---|---|
 | 1-2 | 프로젝트 셋업 | Monorepo(Turborepo), Next.js/Expo 초기화, Prisma Schema, CI/CD, 디자인 시스템 |
 | 3-4 | 인증 + 핵심 CRUD | Auth.js/Firebase Auth, 명함 수동입력/조회/수정/삭제 |
-| 5-6 | OCR + 정리 기능 | Google Vision 연동, S3 업로드, OCR 파싱, 폴더/태그/즐겨찾기 |
+| 5-6 | OCR + 정리 기능 | Tesseract.js 연동, S3 업로드, OCR 파싱, 폴더/태그/즐겨찾기 |
 | 7-8 | 검색 + 내보내기 + QA | Full-text Search, 필터/정렬, vCard/CSV 내보내기, E2E 테스트, 배포 |
 
 **MVP 출시 기준 (Definition of Done):**
@@ -748,7 +749,7 @@ GET /api/v1/cards?search=김&folderId=xxx&tagIds=yyy,zzz&isFavorite=true&sort=cr
 
 | 리스크 | 확률 | 영향 | 완화 전략 |
 |---|---|---|---|
-| OCR 정확도 미달 | 중 | 높 | Google Vision + LLM 후처리, 수정 UI 핵심 UX화, 품질 가이드 |
+| OCR 정확도 미달 | 중 | 높 | Tesseract.js Dual-pass 전처리 (일반/반전), PSM SPARSE_TEXT, 수정 UI 핵심 UX화 |
 | Cross-Platform 코드 공유율 저조 | 중 | 중 | Monorepo + 공유 패키지, 비즈니스 로직 공유, UI만 분리 |
 | Serverless Cold Start | 낮 | 중 | Edge Functions, Warming 전략, Connection Pooling |
 | 이미지 처리 병목 | 중 | 중 | 클라이언트 전처리, S3 Presigned URL, 비동기 처리 |

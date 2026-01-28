@@ -150,7 +150,7 @@
 |---|------|--------|------|
 | 3.1 | S3 클라이언트 (`lib/storage/s3-client.ts`) | S3 연결 | 1.15 |
 | 3.2 | 이미지 처리 서비스 (Sharp 리사이즈/HEIC 변환/썸네일) | `image.service.ts` | - |
-| 3.3 | Google Cloud Vision 클라이언트 | `ocr/vision-client.ts` | - |
+| 3.3 | Tesseract.js OCR 클라이언트 (Worker Pool + Dual-pass 전처리) | `ocr/vision-client.ts` | - |
 | 3.4 | OCR 텍스트 파서 (정규식 + 휴리스틱) | `ocr/text-parser.ts` | - |
 | 3.5 | 스캔 서비스 (업로드 → S3 → OCR → 파싱) | `scan.service.ts` | 3.1-3.4 |
 | 3.6 | `POST /api/v1/scan/upload` API | OCR 업로드 | 3.5 |
@@ -401,10 +401,6 @@ AWS_SECRET_ACCESS_KEY=
 AWS_S3_BUCKET=
 AWS_CLOUDFRONT_URL=
 
-# ──── Google Cloud Vision ────
-GOOGLE_CLOUD_PROJECT_ID=
-GOOGLE_CLOUD_CREDENTIALS=             # JSON 키 파일 내용 (Base64)
-
 # ──── App (Public) ────
 NEXT_PUBLIC_APP_URL=                   # http://localhost:3000
 NEXT_PUBLIC_CDN_URL=                   # CloudFront URL
@@ -424,7 +420,7 @@ EXPO_PUBLIC_FIREBASE_APP_ID=
 
 | 리스크 | 구현 단계 | 완화 전략 |
 |--------|----------|----------|
-| OCR 정확도 미달 | Week 5-6 | 텍스트 파서에 다양한 명함 샘플로 테스트, 수정 UI를 핵심 UX로 설계 |
+| OCR 정확도 미달 | Week 5-6 | Tesseract.js Dual-pass 전처리 (일반/반전), PSM SPARSE_TEXT, DPI 300, rotateAuto 적용, 수정 UI를 핵심 UX로 설계 |
 | 인증 통합 복잡도 | Week 3-4 | Auth.js + Firebase 통합 미들웨어를 먼저 설계/테스트 |
 | Cross-Platform 코드 공유율 | Week 1-2 | 공유 패키지를 초기에 확실히 설계, 비즈니스 로직은 반드시 공유 |
 | Serverless Cold Start | Week 7-8 | Edge Functions 적용, Connection Pooling (Neon) |

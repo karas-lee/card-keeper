@@ -124,10 +124,10 @@
 │                    External Services                              │
 │                                                                   │
 │  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────┐ │
-│  │ PostgreSQL 16 │  │ AWS S3       │  │ Google Cloud Vision    │ │
+│  │ PostgreSQL 16 │  │ AWS S3       │  │ Tesseract.js           │ │
 │  │ (Neon)        │  │ + CloudFront │  │ (OCR Engine)           │ │
-│  │ - FTS tsvector│  │ (이미지 CDN) │  │ - TEXT_DETECTION       │ │
-│  └──────────────┘  └──────────────┘  │ - DOCUMENT_TEXT_DETECT. │ │
+│  │ - FTS tsvector│  │ (이미지 CDN) │  │ - Worker Pool          │ │
+│  └──────────────┘  └──────────────┘  │ - Dual-pass 전처리     │ │
 │                                       └────────────────────────┘ │
 │  ┌──────────────┐  ┌──────────────┐                              │
 │  │ Auth.js v5    │  │ Firebase Auth│                              │

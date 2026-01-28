@@ -276,7 +276,7 @@ module.exports = {
     "bcrypt": "^5.1.0",
     "@aws-sdk/client-s3": "^3.700.0",
     "@aws-sdk/s3-request-presigner": "^3.700.0",
-    "@google-cloud/vision": "^4.3.0",
+    "tesseract.js": "^5.1.0",
     "lucide-react": "^0.468.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -352,7 +352,32 @@ export default config;
 
 ```css
 @import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/* shadcn/ui 컴포넌트를 위한 :root / .dark CSS 변수 포함 */
 ```
+
+> **참고:** Tailwind CSS 4는 `tailwind.config.js` 대신 CSS 기반 `@theme` 블록을 사용합니다. shadcn/ui 컴포넌트가 정상 동작하려면 위 CSS 변수 매핑이 필수적입니다.
 
 ### 4.5 `apps/web/tsconfig.json`
 
@@ -751,10 +776,6 @@ AWS_ACCESS_KEY_ID=""
 AWS_SECRET_ACCESS_KEY=""
 AWS_S3_BUCKET="cardkeeper-images-dev"
 AWS_CLOUDFRONT_URL="https://cdn-dev.cardkeeper.app"
-
-# Google Cloud Vision
-GOOGLE_CLOUD_PROJECT_ID=""
-GOOGLE_CLOUD_CREDENTIALS=""
 
 # App
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
