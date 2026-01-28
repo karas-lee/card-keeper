@@ -44,6 +44,9 @@ playwright-report/
 # Prisma
 prisma/migrations/**/migration_lock.toml
 
+# Uploads (user-generated runtime data)
+**/public/uploads/
+
 # Local HTTPS certificates
 certs/
 
@@ -56,3 +59,4 @@ certs/
 *.orig.*
 android/
 ios/
+my-project/
